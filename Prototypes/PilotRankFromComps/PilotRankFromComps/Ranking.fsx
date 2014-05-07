@@ -62,5 +62,33 @@ diminishByFraction 450.0 0.8 4 |> List.ofSeq
 
 diminishByFraction 450.0 0.8 4 |> Seq.map int |> List.ofSeq
 //val it : int list = [450; 360; 288; 230; 184]
+
+type Gender = M | F
+    with
+        static member Parse = function
+            | "m" | "M" -> M
+            | _ -> F
         
-        
+type CompPlace =
+    {
+        Place : int
+        Name : string
+        Gender : Gender
+        Nat : string
+        // TODO: add a class, eg. open, floater, kingpost etc
+        Score : int
+    }
+
+let compPlacings = query {
+        for r in comp.Rows do
+        select {Place = r.Place; Name = r.Name; Gender = Gender.Parse r.Gender; Nat = r.Nat; Score = r.Total}
+    }
+
+compPlacings |> Array.ofSeq
+
+let checkPlacings = query {
+        for p in compPlacings do
+        sortByDescending p.Score
+    }
+
+checkPlacings |> Seq.mapi (fun i x -> i + 1, x.Place) |> Array.ofSeq
