@@ -58,10 +58,11 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Ranking.fsx" />
+    <None Include="Deedle.fsx" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Ranking.fsx" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
