@@ -29,7 +29,7 @@ type CompRank = CsvProvider<sampleCompFile>
 //                "Hungary", "Moyes Litespeed S 5", "", "6516");
   
 let comps = CompIndex.Load sampleCompIndexFile
-let comp = CompRank.Load sampleFile
+let comp = CompRank.Load sampleCompFile
 
 let maxScore = comp.Rows.Max(fun x -> x.Total)
 
@@ -57,3 +57,16 @@ let sanctionPoints = function
     | C -> 184
 
 sanctionPoints AA
+
+let diminishByFraction startWith (fraction : float) (n : int) =
+    Seq.initInfinite (fun _ -> fraction)
+    |> Seq.take n
+    |> Seq.scan (fun acc x -> acc * x) startWith
+
+diminishByFraction 450.0 0.8 4 |> List.ofSeq
+//val it : float list = [450.0; 360.0; 288.0; 230.4; 184.32]
+
+diminishByFraction 450.0 0.8 4 |> Seq.map int |> List.ofSeq
+//val it : int list = [450; 360; 288; 230; 184]
+        
+        
