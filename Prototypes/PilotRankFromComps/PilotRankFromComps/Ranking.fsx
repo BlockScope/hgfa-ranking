@@ -1,6 +1,11 @@
-﻿#r @"..\packages\FSharp.Data.2.0.7\lib\net40\FSharp.Data.dll"
+﻿#I @"..\packages\FSharp.Data.2.0.7\lib\net40"
+//#I @"..\packages\Deedle.0.9.12"
+
+#r @"FSharp.Data.dll"
+//#load "Deedle.fsx"
 
 open System
+open System.IO
 open System.Linq
 open FSharp.Data
 
@@ -9,8 +14,8 @@ let sampleCompIndexFile = @"..\..\..\Test\CompIndex.csv"
 type CompIndex = CsvProvider<sampleCompIndexFile>
 
 [<Literal>]
-let sampleFile = @"..\..\..\Test\ForbesPreWorlds.csv"
-type CompRank = CsvProvider<sampleFile>
+let sampleCompFile = @"..\..\..\Test\ForbesPreWorlds.csv"
+type CompRank = CsvProvider<sampleCompFile>
 //  {Headers = Some
 //                 [|"Place"; "Name"; "ladder score";
 //                   "ladder score pre-devaluation"; ""; "Gender"; "Nat";
@@ -38,3 +43,17 @@ let groupByScore = query {
         groupBy r.Total
     }
 
+//open Deedle
+//let frameFile = Path.GetFullPath(Path.Combine(__SOURCE_DIRECTORY__, sampleCompFile))
+//let compFrame = Frame.ReadCsv(frameFile, hasHeaders = true, inferTypes = true, inferRows = 0, schema = null, separators = ",", culture = null, maxRows = 0)
+
+type SanctionRanking = AAA | AA | A | B | C
+
+let sanctionPoints = function
+    | AAA -> 450
+    | AA -> 360
+    | A -> 288
+    | B -> 230
+    | C -> 184
+
+sanctionPoints AA
