@@ -13,8 +13,8 @@ type CompIndex = CsvProvider<sampleCompIndexFile>
 
 [<Literal>]
 let compSchemaFile = @"..\..\..\Test\CompSchema.csv"
-//let workingFile = @"..\..\..\Test\CorryongOpen2014.csv"
-let workingFile = @"..\..\..\Test\ForbesPreWorlds.csv"
+let workingFile = @"..\..\..\Test\CorryongOpen2014.csv"
+//let workingFile = @"..\..\..\Test\ForbesPreWorlds.csv"
 
 [<Literal>]
 let schema : string = "Place=int,Name=string,Gender=string,Nat=string,Glider=string,Class=string,Total=int"
@@ -54,18 +54,6 @@ type Gender = M | F
 type Class = Class1 | Class1K | Other of string
     with static member Parse = function | "1" -> Class1 | "1K" -> Class1K | x -> Other x
 
-let maxScore = comp.Rows.Max(fun x -> x.Total)
-
-let maxScore' = query {
-        for r in comp.Rows do
-        maxBy r.Total
-    }
-
-let groupByScore = query {
-        for r in comp.Rows do
-        groupBy r.Total
-    }
-
 type CompPlace =
     {
         Place : int
@@ -90,6 +78,13 @@ let compPlacings = query {
     }
 
 compPlacings |> Array.ofSeq
+
+let groupedPlacings = query {
+        for p in compPlacings do
+        groupBy p.Score
+    }
+
+groupedPlacings |> Array.ofSeq
 
 let checkPlacings = query {
         for p in compPlacings do
