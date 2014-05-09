@@ -12,34 +12,17 @@ let sampleCompIndexFile = @"..\..\..\Test\CompIndex.csv"
 type CompIndex = CsvProvider<sampleCompIndexFile>
 
 [<Literal>]
-let sampleCompFile = @"..\..\..\Test\ForbesPreWorlds.csv"
-type CompRank = CsvProvider<sampleCompFile>
-//  {Headers = Some
-//                 [|"Place"; "Name"; "ladder score";
-//                   "ladder score pre-devaluation"; ""; "Gender"; "Nat";
-//                   "Glider"; "Class"; "Total"|];
-//     NumberOfColumns = 10;
-//     Quote = '"';
-//     Rows = seq
-//              [("1", "Rohan Holtkamp", "230", "360", "Pre-Worlds 2012", "M",
-//                "Australia", "Airborne Rev 13.5", "", "6628");
-//               ("2", "Attila Bertok", "", "", "Pre-Worlds 2012", "M",
-//                "Hungary", "Moyes Litespeed S 5", "", "6516");
+let compSchemaFile = @"..\..\..\Test\CompSchema.csv"
+//let workingFile = @"..\..\..\Test\CorryongOpen2014.csv"
+let workingFile = @"..\..\..\Test\ForbesPreWorlds.csv"
+
+[<Literal>]
+let schema : string = "Place=int,Name=string,Gender=string,Nat=string,Glider=string,Class=string,Total=int"
+
+type CompRank = CsvProvider<compSchemaFile, HasHeaders = true, Schema = schema>
   
 let comps = CompIndex.Load sampleCompIndexFile
-let comp = CompRank.Load sampleCompFile
-
-let maxScore = comp.Rows.Max(fun x -> x.Total)
-
-let maxScore' = query {
-        for r in comp.Rows do
-        maxBy r.Total
-    }
-
-let groupByScore = query {
-        for r in comp.Rows do
-        groupBy r.Total
-    }
+let comp = CompRank.Load workingFile
 
 type SanctionRanking = AAA | AA | A | B | C
 
@@ -63,25 +46,47 @@ diminishByFraction 450.0 0.8 4 |> List.ofSeq
 diminishByFraction 450.0 0.8 4 |> Seq.map int |> List.ofSeq
 //val it : int list = [450; 360; 288; 230; 184]
 
+type Nat = AUS | NZL | Other of string
+    with static member Parse = function | "AUS" -> AUS | "NZL" -> NZL | x -> Other x
 type Gender = M | F
-    with
-        static member Parse = function
-            | "m" | "M" -> M
-            | _ -> F
-        
+    with static member Parse = function | "m" | "M" -> M | _ -> F
+
+type Class = Class1 | Class1K | Other of string
+    with static member Parse = function | "1" -> Class1 | "1K" -> Class1K | x -> Other x
+
+let maxScore = comp.Rows.Max(fun x -> x.Total)
+
+let maxScore' = query {
+        for r in comp.Rows do
+        maxBy r.Total
+    }
+
+let groupByScore = query {
+        for r in comp.Rows do
+        groupBy r.Total
+    }
+
 type CompPlace =
     {
         Place : int
         Name : string
         Gender : Gender
-        Nat : string
-        // TODO: add a class, eg. open, floater, kingpost etc
+        Nat : Nat
+        Class : Class
         Score : int
     }
 
 let compPlacings = query {
         for r in comp.Rows do
-        select {Place = r.Place; Name = r.Name; Gender = Gender.Parse r.Gender; Nat = r.Nat; Score = r.Total}
+        select
+            {
+                Place = r.Place
+                Name = r.Name
+                Gender = Gender.Parse r.Gender
+                Nat = Nat.Parse r.Nat
+                Class = Class.Parse r.Class
+                Score = r.Total
+            }
     }
 
 compPlacings |> Array.ofSeq
