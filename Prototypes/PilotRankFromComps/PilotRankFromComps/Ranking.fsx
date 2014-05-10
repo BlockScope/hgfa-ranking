@@ -91,4 +91,11 @@ let checkPlacings = query {
         sortByDescending p.Score
     }
 
-checkPlacings |> Seq.mapi (fun i x -> i + 1, x.Place) |> Array.ofSeq
+let expectedVersusPlaced = checkPlacings |> Seq.mapi (fun i x -> i + 1, x.Place) |> Array.ofSeq
+expectedVersusPlaced |> Seq.filter (fun (a, b) -> a <> b) |> Array.ofSeq
+
+let fractionate (pilotScores : (string * int) seq) : (string * float) seq =
+    let maxScore = (pilotScores |> Seq.map snd) |> Seq.max |> float
+    pilotScores |> Seq.map (fun (a, b) -> (a, (float b) / maxScore))
+
+compPlacings |> Seq.map (fun x -> x.Name, x.Score) |> fractionate |> Array.ofSeq
