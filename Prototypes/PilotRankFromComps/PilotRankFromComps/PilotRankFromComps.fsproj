@@ -59,10 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Deedle.fsx" />
+    <None Include="Ranking.fsx" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Ranking.fsx" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
