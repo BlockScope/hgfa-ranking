@@ -81,10 +81,24 @@ compPlacings |> Array.ofSeq
 
 let groupedPlacings = query {
         for p in compPlacings do
-        groupBy p.Score
+        groupBy p.Score into g
+        sortByDescending g.Key
     }
 
-groupedPlacings |> Array.ofSeq
+groupedPlacings |> Seq.mapi (fun i g -> (i + 1, g)) |> Array.ofSeq
+
+type PlaceState = (int * int * CompPlace list)
+let makePlace (xs : PlaceState) (ys : int * CompPlace list) : PlaceState =
+    let xTally, xPlace, _ = xs
+    let yTally, ys' = ys
+    (xTally + ys'.Length, xPlace + 1, ys')
+
+let ranked =
+    groupedPlacings
+    |> Seq.map (fun g -> (g.Key, g.Cast<CompPlace>() |> List.ofSeq))
+    |> Seq.scan makePlace (0, 0, [])
+
+ranked |> Array.ofSeq
 
 let checkPlacings = query {
         for p in compPlacings do
